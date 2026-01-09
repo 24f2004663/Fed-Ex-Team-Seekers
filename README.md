@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FedEx Smart Recovery: AI-Driven Debt Collection & Allocation Engine
 
-## Getting Started
+## 🚀 Problem Statement
+In the traditional logistics and supply chain debt recovery process, **allocating delinquent accounts to collection agencies is often manual, biased, and inefficient.**
 
-First, run the development server:
+### Key Challenges:
+1.  **Inefficient Allocation**: Assigning cases based on simple round-robin or manual preference fails to optimize for agency strengths (e.g., some agencies are better at high-value feedback, others at volume).
+2.  **Lack of Real-Time Visibility**: Managers struggle to track "Promise to Pay" (PTP) commitments vs. actual recoveries in real-time across multiple external partners.
+3.  **SLA Breaches**: Without automated monitoring, cases sit idle ("ghosting") for too long, reducing the likelihood of recovery as debt ages.
+4.  **No Performance Incentives**: "Flat" allocation strategies don't reward high-performing agencies with better quality leads (High Priority cases).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 💡 The Solution: FedEx Smart Recovery
+We have built an **Intelligent Allocation Command Center** that acts as the brain between FedEx's outstanding invoices and the network of external collection agencies.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Core Modules:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. The Allocation Engine (Python + SQLite WAL)
+Instead of random assignment, our system uses a **weighted, performance-based algorithm**:
+*   **Performance Scoring**: Agencies are scored (0-100%) based on Recovery Rate and SLA Adherence.
+*   **Dynamic Capacities**:
+    *   **Alpha Collections**: Proven high-performer (Capacity: 4).
+    *   **Beta Recovery**: Mid-tier performer (Capacity: 5).
+    *   **Gamma Partners**: Probationary/New (Capacity: 3).
+*   **Smart Tiering**:
+    *   **High Priority Cases** (> $50k) are **exclusively** routed to agencies with >80% performance scores.
+    *   **Low Performance Penalty**: Agencies dropping below 50% are cut off from High Priority allocations automatically.
 
-## Learn More
+### 2. The Agency Portal
+A specialized interface for external partners to view their work without accessing sensitive FedEx internal data.
+*   **Actions**: "Accept", "Reject", "Upload Proof", "Log Promise to Pay".
+*   **Capacity Analysis**: A real-time dashboard showing their 12-month performance trend and their current **High Priority Allowance**. This gamifies the process—agencies know if they improve their score, they get better cases.
+*   **Demo Safety**: Robust error handling ensures the portal works fluidly even under high load.
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Automated Governance
+*   **SLA Watchdog**: Background processes monitor "Assigned" cases. If an agency sits on a case for >48 hours without action, it is **automatically revoked** and reallocated to a competitor.
+*   **Race-Condition Safe**: Built with transactional integrity (SQLite WAL mode + Next.js Server Actions) to handle concurrent updates without data loss.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Technology Stack
+*   **Frontend**: Next.js 14 (App Router), Tailwind CSS, Lucide Icons.
+*   **Backend Logic**: Next.js Server Actions + Python Subprocesses (Interoperability Layer).
+*   **Database**: SQLite (with Write-Ahead Logging for concurrency).
+*   **Visualization**: Recharts (for Analytics & Historical Trends).
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ✅ Key Features
+- [x] **Smart Ingestion**: Import raw Excel/CSV data and instantly classify priority (High/Medium/Low).
+- [x] **Ghost Behavior Prevention**: Immediate UI updates using React Optimistic updates and enforced server revalidation.
+- [x] **Conflict-Free Concurrency**: Python scripts and Node.js server actions share a database safely using robust locking strategies.
+- [x] **Executive Dashboard**: A "Single Pane of Glass" view for FedEx Managers to see Total Exposure, Recovery Rate, and Live Agency Performance.

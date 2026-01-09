@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model User {
+  id             String  @id @default(uuid())
+  email          String  @unique
+  name           String
+  role           String  // ADMIN, AGENCY, INTERNAL, MANAGER
+  organizationId String? // Use for Agency ID
+  cases          Case[]
+}
+
+model Invoice {
+  id          String   @id @default(uuid())
+  invoiceNumber String @unique
+  amount      Float
+  currency    String   @default("USD")
+  dueDate     DateTime
+  customerID  String
+  customerName String
+  region      String
+  status      String   // OPEN, PAID, OVERDUE, DISPUTE
+  
+  case        Case?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Case {
+  id                  String   @id @default(uuid())
+  invoiceId           String   @unique
+  invoice             Invoice  @relation(fields: [invoiceId], references: [id])
+  
+  aiScore             Float    // 0-100
+  recoveryProbability Float    // 0-1
+  priority            String   // HIGH, MEDIUM, LOW
+  
+  status              String   // NEW, ASSIGNED, IN_PROGRESS, PTP, DISPUTE, PAID, UNREACHABLE, CLOSED
+  assignedToId        String?
+  assignedTo          User?    @relation(fields: [assignedToId], references: [id])
+  assignedAt          DateTime? // Added for precise SLA tracking
+  
+  currentSLAStatus    String   // ACTIVE, BREACHED, PAUSED, COMPLETED
+  slaBreachTime       DateTime?
+  
+  auditLogs           AuditLog[]
+  slaRecords          SLA[]
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id])
+  
+  actorId   String
+  action    String   // NOTE, STATUS_CHANGE, ASSIGN, UPLOAD, PTP, DISPUTE
+  details   String
+  timestamp DateTime @default(now())
+}
+
+model SLA {
+  id        String   @id @default(uuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id])
+  
+  stage     String   // FIRST_CONTACT, FOLLOW_UP, RESOLUTION
+  status    String   // PENDING, ACTIVE, BREACHED, MET
+  startTime DateTime @default(now())
+  endTime   DateTime?
+  dueTime   DateTime
+}
