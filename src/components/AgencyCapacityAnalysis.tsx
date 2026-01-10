@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { Card } from './Card';
 import { Badge } from './Badge';
+import { useEffect, useState } from 'react';
 
 interface Props {
     agencyId: string;
@@ -20,6 +21,11 @@ interface Props {
 }
 
 export function AgencyCapacityAnalysis({ agencyId, currentScore, history }: Props) {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
     // 1. Logic for Thresholds
     // "collection threshold: alpha = 4, beta = 5, gamma = 3"
     // Default to 1 if new (score 0), else 3
@@ -92,26 +98,30 @@ export function AgencyCapacityAnalysis({ agencyId, currentScore, history }: Prop
                 <div className="md:col-span-2 h-64 flex flex-col">
                     <h3 className="text-sm font-bold text-gray-500 mb-2 uppercase tracking-wide">12-Month Performance Trend</h3>
                     <div className="flex-1 min-h-0">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={data}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
-                                <YAxis domain={[0, 100]} hide />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                    cursor={{ stroke: '#cbd5e1', strokeWidth: 1 }}
-                                />
-                                <ReferenceLine y={80} stroke="#22c55e" strokeDasharray="3 3" label={{ value: 'Excellent (80%)', fill: '#22c55e', fontSize: 10 }} />
-                                <Line
-                                    type="monotone"
-                                    dataKey="score"
-                                    stroke="var(--color-primary)"
-                                    strokeWidth={3}
-                                    dot={{ r: 4, fill: 'var(--color-primary)', strokeWidth: 2, stroke: '#fff' }}
-                                    activeDot={{ r: 6 }}
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
+                        {mounted ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={data}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
+                                    <YAxis domain={[0, 100]} hide />
+                                    <Tooltip
+                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                        cursor={{ stroke: '#cbd5e1', strokeWidth: 1 }}
+                                    />
+                                    <ReferenceLine y={80} stroke="#22c55e" strokeDasharray="3 3" label={{ value: 'Excellent (80%)', fill: '#22c55e', fontSize: 10 }} />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="score"
+                                        stroke="var(--color-primary)"
+                                        strokeWidth={3}
+                                        dot={{ r: 4, fill: 'var(--color-primary)', strokeWidth: 2, stroke: '#fff' }}
+                                        activeDot={{ r: 6 }}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="w-full h-full bg-gray-50 rounded-lg animate-pulse" />
+                        )}
                     </div>
                 </div>
 
