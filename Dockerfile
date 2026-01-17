@@ -53,6 +53,7 @@ USER nextjs
 EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV HOME=/tmp
 
 # Note: In standalone mode, we run 'node server.js'.
 # However, we also need to seed the DB.
