@@ -58,4 +58,4 @@ ENV HOME=/tmp
 # Note: In standalone mode, we run 'node server.js'.
 # However, we also need to seed the DB.
 # We chain the commands.
-CMD ["sh", "-c", "npx prisma db push && node prisma/simulate_pipeline.js && node server.js"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma db push && node prisma/simulate_pipeline.js && node server.js"]
