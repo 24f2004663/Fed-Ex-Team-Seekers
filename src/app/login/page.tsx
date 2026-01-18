@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, Lock, ArrowRight, Eye, EyeOff, ChevronDown, Search } from 'lucide-react';
-import { signIn } from 'next-auth/react';
+import { loginUser } from '@/app/auth-actions';
 import { getAgenciesAction } from '@/app/agency/actions'; // Fetch from store
 import clsx from 'clsx';
 
@@ -63,17 +63,18 @@ export default function LoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const agencyIdString = role === 'AGENCY' && selectedAgency ? selectedAgency.id : undefined;
+        const agencyId = role === 'AGENCY' && selectedAgency ? selectedAgency.id : undefined;
 
-        // FIX: Use client-side signIn to handle redirects correctly without Server Action exceptions
-        await signIn("credentials", {
-            email: role === 'ENTERPRISE' ? 'admin@fedex.com' : 'agency@alpha.com', // Using the hardcoded creds from the user's snippet for safety
-            password: role === 'ENTERPRISE' ? 'admin123' : 'agency123',
-            agencyId: agencyIdString,
-            callbackUrl: role === 'ENTERPRISE' ? '/' : '/agency'
-        });
+        // Call Server Action to set Cookie
+        const result = await loginUser(role, agencyId);
 
-        // No need to set isLoading(false) or redirect manually; NextAuth handles the full page reload/redirect
+        if (result.success) {
+            if (role === 'ENTERPRISE') {
+                router.push('/');
+            } else {
+                router.push('/agency');
+            }
+        }
     };
 
     return (
@@ -187,7 +188,7 @@ export default function LoginPage() {
                                     <input
                                         type="text"
                                         readOnly
-                                        value="admin@fedex.com"
+                                        value="admin"
                                         className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] text-gray-700 font-mono"
                                     />
                                 </div>
@@ -201,8 +202,8 @@ export default function LoginPage() {
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                 <input
                                     type={showPassword ? "text" : "password"}
-                                    readOnly // Keep read-only for demo ease, but update value
-                                    value={role === 'ENTERPRISE' ? "admin123" : "agency123"}
+                                    readOnly
+                                    value={role === 'ENTERPRISE' ? "admin@123" : "demo@123"}
                                     className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] text-gray-700 font-mono"
                                 />
                                 <button

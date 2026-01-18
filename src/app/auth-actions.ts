@@ -1,9 +1,30 @@
 'use server';
 
-import { signOut } from '@/auth';
+import { cookies } from 'next/headers';
 
-// loginUser REMOVED - using client-side signIn in login/page.tsx
+export async function loginUser(role: string, agencyId?: string) {
+    const cookieStore = await cookies();
+    // In a real app, sign a JWT here. For demo, a JSON string is fine.
+    const sessionData = JSON.stringify({
+        role,
+        agencyId,
+        lastActive: Date.now()
+    });
+
+    // Set 24h expiration
+    cookieStore.set('fedex_auth_token', sessionData, {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 60 * 60 * 24,
+        path: '/',
+    });
+
+    return { success: true };
+}
+
+import { redirect } from 'next/navigation';
 
 export async function logoutUser() {
-    await signOut({ redirectTo: '/login' });
+    (await cookies()).delete('fedex_auth_token');
+    redirect('/login');
 }

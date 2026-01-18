@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Card } from "@/components/Card";
 import { Plus, Save, Trash2, RotateCcw, Upload } from "lucide-react";
 import { getAgenciesAction, addAgencyAction, removeAgencyAction, resetAgenciesAction, uploadAgencyDataAction } from "@/app/agency/actions";
@@ -13,7 +12,6 @@ interface Agency {
 }
 
 export const AgencyAdministrationCard = () => {
-    const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [newAgencyName, setNewAgencyName] = useState("");
@@ -71,8 +69,7 @@ export const AgencyAdministrationCard = () => {
     };
 
     const handleModify = () => {
-        // Redirect to new Governance Portal
-        router.push('/admin/agencies');
+        setIsEditing(true);
     };
 
     const handleSave = () => {
@@ -146,7 +143,7 @@ export const AgencyAdministrationCard = () => {
                 {!isEditing && (
                     <button
                         onClick={handleModify}
-                        className="bg-[var(--color-secondary)] text-white px-4 py-2 rounded-lg shadow hover:bg-[var(--color-secondary-dark)] transition text-xs font-bold"
+                        className="text-xs text-blue-600 hover:text-blue-800 font-medium border border-blue-200 px-3 py-1 rounded bg-blue-50 transition-colors"
                     >
                         Modify
                     </button>

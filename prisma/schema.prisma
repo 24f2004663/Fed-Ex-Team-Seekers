@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -17,37 +17,8 @@ model User {
   email          String  @unique
   name           String
   role           String  // ADMIN, AGENCY, INTERNAL, MANAGER
-  organizationId String? // Legacy/Generic
-  agencyId       String?
-  agency         Agency? @relation(fields: [agencyId], references: [id])
+  organizationId String? // Use for Agency ID
   cases          Case[]
-}
-
-model Agency {
-  id        String   @id @default(uuid())
-  name      String
-  status    String   @default("ACTIVE") // ACTIVE, INACTIVE
-  capacity  Int      @default(5)
-  region    String   @default("NA")
-  deletedAt DateTime?
-
-  users       User[]
-  performance AgencyPerformance[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model AgencyPerformance {
-  id           String @id @default(uuid())
-  agencyId     String
-  agency       Agency @relation(fields: [agencyId], references: [id])
-  month        String // YYYY-MM
-  recoveryRate Float
-  slaAdherence Float
-  avgDSO       Float
-  
-  createdAt    DateTime @default(now())
 }
 
 model Invoice {

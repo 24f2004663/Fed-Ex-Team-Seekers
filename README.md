@@ -43,47 +43,11 @@ A specialized interface for external partners to view their work without accessi
 
 ---
 
-## 🛠️ Technology Stack (Enterprise Edition)
-*   **Frontend**: Next.js 16 (App Router), Tailwind CSS, Lucide Icons.
-*   **Authentication**: NextAuth.js v5 (Secure Credentials Flow).
-*   **Backend**: 
-    *   **API**: Next.js Server Actions.
-    *   **Compute**: Python AI Engine (Scikit-learn) decoupled via Workers.
-    *   **Queue**: BullMQ + Redis (Asynchronous Job Processing).
-*   **Database**: PostgreSQL (Prisma ORM).
-*   **Infrastructure**: Docker Compose.
-
-## 🚀 How to Run (Enterprise Edition)
-
-### Prerequisites
-1.  **Node.js 20+**
-2.  **Docker Desktop** (Running)
-
-### Step 1: Start Infrastructure
-Spin up PostgreSQL and Redis containers.
-```bash
-docker compose up -d
-```
-
-### Step 2: Initialize Database
-Migrate the schema and seed initial data.
-```bash
-npx prisma db push
-node prisma/simulate_pipeline.js
-```
-
-### Step 3: Start Backend (App)
-Run the Next.js application.
-```bash
-npm run dev
-```
-Access at: [http://localhost:3000](http://localhost:3000)
-
-### Step 4: Start Background Worker
-In a **new terminal**, start the worker to process AI jobs (Allocation/Ingestion).
-```bash
-npx tsx worker.ts
-```
+## 🛠️ Technology Stack
+*   **Frontend**: Next.js 14 (App Router), Tailwind CSS, Lucide Icons.
+*   **Backend Logic**: Next.js Server Actions + Python Subprocesses (Interoperability Layer).
+*   **Database**: SQLite (with Write-Ahead Logging for concurrency).
+*   **Visualization**: Recharts (for Analytics & Historical Trends).
 
 ## ✅ Key Features
 - [x] **Smart Ingestion**: Import raw Excel/CSV data and instantly classify priority (High/Medium/Low).
