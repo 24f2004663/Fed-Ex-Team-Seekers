@@ -62,4 +62,4 @@ ENV HOME=/tmp
 # However, we also need to seed the DB.
 # We chain the commands.
 # We use the globally installed prisma CLI to avoid relying on node_modules location in standalone build
-CMD ["sh", "-c", "prisma db push --skip-generate && node prisma/simulate_pipeline.js && node server.js"]
+CMD ["sh", "-c", "prisma db push && node prisma/simulate_pipeline.js && node server.js"]
